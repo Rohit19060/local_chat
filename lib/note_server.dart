@@ -9,21 +9,20 @@ class NoteServer {
   List<Socket> clients = [];
   late void Function(String) addMessage;
 
-  Future<void> startServer(int port) async {
+  Future<String> startServer(int port) async {
+    var serverIp = '';
     try {
       final localIp = await getLocalIp();
       log(localIp);
       serverSocket = await ServerSocket.bind(localIp, port, shared: true);
-      addMessage('Server Ip: ${serverSocket?.address}');
+      serverIp = serverSocket!.address.address;
       serverSocket!.listen((client) {
-        if (clients.any((x) => x.remoteAddress.address == client.remoteAddress.address && x.remotePort == client.remotePort)) {
+        if (clients.any((x) => x.remoteAddress.address == client.remoteAddress.address)) {
           log('Client already connected');
           return;
         }
-
         clients.add(client);
         log('Client connected: ${client.remoteAddress.address}:${client.remotePort}');
-
         client.listen(
           (data) {
             final receivedMessage = String.fromCharCodes(data).trim();
@@ -31,7 +30,7 @@ class NoteServer {
             addMessage('Client(${client.remoteAddress.address}): $receivedMessage');
 
             for (final x in clients) {
-              if (client != x) {
+              if (client != x && x.address != client.address) {
                 x.write('$receivedMessage\n');
               }
             }
@@ -49,11 +48,13 @@ class NoteServer {
       log('Error in starting server: $e');
       rethrow;
     }
+    return serverIp;
   }
 
   Future<void> stopServer() async {
     await serverSocket?.close();
     serverSocket = null;
+    clients.clear();
     log('Server stopped');
   }
 

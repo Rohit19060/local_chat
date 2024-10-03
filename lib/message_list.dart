@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
+
 class MessageList extends StatelessWidget {
   const MessageList({
     super.key,
@@ -25,6 +27,13 @@ class MessageList extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
                   constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.65),
                   decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.8),
+                        blurRadius: 2,
+                        spreadRadius: 2,
+                      ),
+                    ],
                     color: itsMe ? const Color.fromARGB(255, 0, 0, 0) : Colors.blue,
                     borderRadius: itsMe
                         ? const BorderRadius.only(
